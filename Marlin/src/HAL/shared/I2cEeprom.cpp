@@ -77,7 +77,7 @@ static uint8_t eeprom_device_address = 0x50;
 static void eeprom_init(void) {
   static bool eeprom_initialized = false;
   if (!eeprom_initialized) {
-    Wire.begin();
+    Wire1.begin();
     eeprom_initialized = true;
   }
 }
@@ -87,11 +87,11 @@ void eeprom_write_byte(unsigned char *pos, unsigned char value) {
 
   eeprom_init();
 
-  Wire.beginTransmission(eeprom_device_address);
-  Wire.write((int)(eeprom_address >> 8));   // MSB
-  Wire.write((int)(eeprom_address & 0xFF)); // LSB
-  Wire.write(value);
-  Wire.endTransmission();
+  Wire1.beginTransmission(eeprom_device_address);
+  Wire1.write((int)(eeprom_address >> 8));   // MSB
+  Wire1.write((int)(eeprom_address & 0xFF)); // LSB
+  Wire1.write(value);
+  Wire1.endTransmission();
 
   // wait for write cycle to complete
   // this could be done more efficiently with "acknowledge polling"
@@ -103,23 +103,23 @@ void eeprom_write_byte(unsigned char *pos, unsigned char value) {
 void eeprom_update_block(const void *pos, void* eeprom_address, size_t n) {
   eeprom_init();
 
-  Wire.beginTransmission(eeprom_device_address);
-  Wire.write((int)((unsigned)eeprom_address >> 8));   // MSB
-  Wire.write((int)((unsigned)eeprom_address & 0xFF)); // LSB
-  Wire.endTransmission();
+  Wire1.beginTransmission(eeprom_device_address);
+  Wire1.write((int)((unsigned)eeprom_address >> 8));   // MSB
+  Wire1.write((int)((unsigned)eeprom_address & 0xFF)); // LSB
+  Wire1.endTransmission();
 
   uint8_t *ptr = (uint8_t*)pos;
   uint8_t flag = 0;
-  Wire.requestFrom(eeprom_device_address, (byte)n);
-  for (byte c = 0; c < n && Wire.available(); c++)
-    flag |= Wire.read() ^ ptr[c];
+  Wire1.requestFrom(eeprom_device_address, (byte)n);
+  for (byte c = 0; c < n && Wire1.available(); c++)
+    flag |= Wire1.read() ^ ptr[c];
 
   if (flag) {
-    Wire.beginTransmission(eeprom_device_address);
-    Wire.write((int)((unsigned)eeprom_address >> 8));   // MSB
-    Wire.write((int)((unsigned)eeprom_address & 0xFF)); // LSB
-    Wire.write((uint8_t*)pos, n);
-    Wire.endTransmission();
+    Wire1.beginTransmission(eeprom_device_address);
+    Wire1.write((int)((unsigned)eeprom_address >> 8));   // MSB
+    Wire1.write((int)((unsigned)eeprom_address & 0xFF)); // LSB
+    Wire1.write((uint8_t*)pos, n);
+    Wire1.endTransmission();
 
     // wait for write cycle to complete
     // this could be done more efficiently with "acknowledge polling"
@@ -134,25 +134,25 @@ unsigned char eeprom_read_byte(unsigned char *pos) {
 
   eeprom_init();
 
-  Wire.beginTransmission(eeprom_device_address);
-  Wire.write((int)(eeprom_address >> 8));   // MSB
-  Wire.write((int)(eeprom_address & 0xFF)); // LSB
-  Wire.endTransmission();
-  Wire.requestFrom(eeprom_device_address, (byte)1);
-  return Wire.available() ? Wire.read() : 0xFF;
+  Wire1.beginTransmission(eeprom_device_address);
+  Wire1.write((int)(eeprom_address >> 8));   // MSB
+  Wire1.write((int)(eeprom_address & 0xFF)); // LSB
+  Wire1.endTransmission();
+  Wire1.requestFrom(eeprom_device_address, (byte)1);
+  return Wire1.available() ? Wire1.read() : 0xFF;
 }
 
 // maybe let's not read more than 30 or 32 bytes at a time!
 void eeprom_read_block(void* pos, const void* eeprom_address, size_t n) {
   eeprom_init();
 
-  Wire.beginTransmission(eeprom_device_address);
-  Wire.write((int)((unsigned)eeprom_address >> 8));   // MSB
-  Wire.write((int)((unsigned)eeprom_address & 0xFF)); // LSB
-  Wire.endTransmission();
-  Wire.requestFrom(eeprom_device_address, (byte)n);
+  Wire1.beginTransmission(eeprom_device_address);
+  Wire1.write((int)((unsigned)eeprom_address >> 8));   // MSB
+  Wire1.write((int)((unsigned)eeprom_address & 0xFF)); // LSB
+  Wire1.endTransmission();
+  Wire1.requestFrom(eeprom_device_address, (byte)n);
   for (byte c = 0; c < n; c++ )
-    if (Wire.available()) *((uint8_t*)pos + c) = Wire.read();
+    if (Wire1.available()) *((uint8_t*)pos + c) = Wire1.read();
 }
 
 
