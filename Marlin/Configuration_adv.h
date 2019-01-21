@@ -134,7 +134,7 @@
 #endif
 
 // Show extra position information in M114
-//#define M114_DETAIL
+#define M114_DETAIL
 
 // Show Temperature ADC value
 // Enable for M105 to include ADC values read from temperature sensors.
@@ -237,7 +237,7 @@
  * Multiple extruders can be assigned to the same pin in which case
  * the fan will turn on when any selected extruder is above the threshold.
  */
-#define E0_AUTO_FAN_PIN -1
+#define E0_AUTO_FAN_PIN 5
 #define E1_AUTO_FAN_PIN -1
 #define E2_AUTO_FAN_PIN -1
 #define E3_AUTO_FAN_PIN -1
@@ -405,7 +405,7 @@
 #define Y_HOME_BUMP_MM 5
 #define Z_HOME_BUMP_MM 2
 #define HOMING_BUMP_DIVISOR { 2, 2, 4 }  // Re-Bump Speed Divisor (Divides the Homing Feedrate)
-//#define QUICK_HOME                     // If homing includes X and Y, do a diagonal move initially
+#define QUICK_HOME                     // If homing includes X and Y, do a diagonal move initially
 
 // When G28 is called, this option will make Y home before X
 //#define HOME_Y_BEFORE_X
@@ -545,19 +545,19 @@
 // @section lcd
 
 // Include a page of printer information in the LCD Main Menu
-//#define LCD_INFO_MENU
+#define LCD_INFO_MENU
 
 // Scroll a longer status message into view
-//#define STATUS_MESSAGE_SCROLLING
+#define STATUS_MESSAGE_SCROLLING
 
 // On the Info Screen, display XY with one decimal place when possible
-//#define LCD_DECIMAL_SMALL_XY
+#define LCD_DECIMAL_SMALL_XY
 
 // The timeout (in ms) to return to the status screen from sub-menus
 //#define LCD_TIMEOUT_TO_STATUS 15000
 
 // Add an 'M73' G-code to set the current percentage
-//#define LCD_SET_PROGRESS_MANUALLY
+#define LCD_SET_PROGRESS_MANUALLY
 
 #if ENABLED(SDSUPPORT) || ENABLED(LCD_SET_PROGRESS_MANUALLY)
   //#define LCD_PROGRESS_BAR              // Show a progress bar on HD44780 LCDs for SD printing
@@ -574,7 +574,7 @@
  * LED Control Menu
  * Enable this feature to add LED Control to the LCD menu
  */
-//#define LED_CONTROL_MENU
+#define LED_CONTROL_MENU
 #if ENABLED(LED_CONTROL_MENU)
   #define LED_COLOR_PRESETS                 // Enable the Preset Color menu option
   #if ENABLED(LED_COLOR_PRESETS)
@@ -583,7 +583,7 @@
     #define LED_USER_PRESET_BLUE         0  // User defined BLUE value
     #define LED_USER_PRESET_WHITE      255  // User defined WHITE value
     #define LED_USER_PRESET_BRIGHTNESS 255  // User defined intensity
-    //#define LED_USER_PRESET_STARTUP       // Have the printer display the user preset color on startup
+    #define LED_USER_PRESET_STARTUP       // Have the printer display the user preset color on startup
   #endif
 #endif // LED_CONTROL_MENU
 
@@ -604,7 +604,7 @@
   #define SDCARD_RATHERRECENTFIRST
 
   // Add an option in the menu to run all auto#.g files
-  //#define MENU_ADDAUTOSTART
+  #define MENU_ADDAUTOSTART
 
   /**
    * Continue after Power-Loss (Creality3D)
@@ -643,13 +643,13 @@
    *  - SDSORT_CACHE_NAMES will retain the sorted file listing in RAM. (Expensive!)
    *  - SDSORT_DYNAMIC_RAM only uses RAM when the SD menu is visible. (Use with caution!)
    */
-  //#define SDCARD_SORT_ALPHA
+  #define SDCARD_SORT_ALPHA
 
   // SD Card Sorting options
   #if ENABLED(SDCARD_SORT_ALPHA)
     #define SDSORT_LIMIT       40     // Maximum number of sorted items (10-256). Costs 27 bytes each.
     #define FOLDER_SORTING     -1     // -1=above  0=none  1=below
-    #define SDSORT_GCODE       false  // Allow turning sorting on/off with LCD and M34 g-code.
+    #define SDSORT_GCODE       true   // Allow turning sorting on/off with LCD and M34 g-code.
     #define SDSORT_USES_RAM    false  // Pre-allocate a static array for faster pre-sorting.
     #define SDSORT_USES_STACK  false  // Prefer the stack for pre-sorting to give back some SRAM. (Negated by next 2 options.)
     #define SDSORT_CACHE_NAMES false  // Keep sorted items in RAM longer for speedy performance. Most expensive option.
@@ -659,10 +659,10 @@
   #endif
 
   // This allows hosts to request long names for files and folders with M33
-  //#define LONG_FILENAME_HOST_SUPPORT
+  #define LONG_FILENAME_HOST_SUPPORT
 
   // Enable this option to scroll long filenames in the SD card menu
-  //#define SCROLL_LONG_FILENAMES
+  #define SCROLL_LONG_FILENAMES
 
   /**
    * This option allows you to abort SD printing when any endstop is triggered.
@@ -699,25 +699,25 @@
  */
 #if ENABLED(DOGLCD)
   // Show SD percentage next to the progress bar
-  //#define DOGM_SD_PERCENT
+  #define DOGM_SD_PERCENT
 
   // Enable to save many cycles by drawing a hollow frame on the Info Screen
-  #define XYZ_HOLLOW_FRAME
+  //#define XYZ_HOLLOW_FRAME
 
   // Enable to save many cycles by drawing a hollow frame on Menu Screens
-  #define MENU_HOLLOW_FRAME
+  //#define MENU_HOLLOW_FRAME
 
   // A bigger font is available for edit items. Costs 3120 bytes of PROGMEM.
   // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.
-  //#define USE_BIG_EDIT_FONT
+  #define USE_BIG_EDIT_FONT
 
   // A smaller font may be used on the Info Screen. Costs 2300 bytes of PROGMEM.
   // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.
-  //#define USE_SMALL_INFOFONT
+  #define USE_SMALL_INFOFONT
 
   // Enable this option and reduce the value to optimize screen updates.
   // The normal delay is 10µs. Use the lowest value that still gives a reliable display.
-  //#define DOGM_SPI_DELAY_US 5
+  #define DOGM_SPI_DELAY_US 5
 
   // Swap the CW/CCW indicators in the graphics overlay
   //#define OVERLAY_GFX_REVERSE
@@ -852,7 +852,7 @@
 #endif
 
 // Support for G5 with XYZE destination and IJPQ offsets. Requires ~2666 bytes.
-//#define BEZIER_CURVE_SUPPORT
+#define BEZIER_CURVE_SUPPORT
 
 // G38.2 and G38.3 Probe Target
 // Set MULTIPLE_PROBING if you want G38 to double touch
@@ -919,16 +919,16 @@
 // The number of linear motions that can be in the plan at any give time.
 // THE BLOCK_BUFFER_SIZE NEEDS TO BE A POWER OF 2 (e.g. 8, 16, 32) because shifts and ors are used to do the ring-buffering.
 #if ENABLED(SDSUPPORT)
-  #define BLOCK_BUFFER_SIZE 16 // SD,LCD,Buttons take more memory, block buffer needs to be smaller
+  #define BLOCK_BUFFER_SIZE 32 // SD,LCD,Buttons take more memory, block buffer needs to be smaller
 #else
-  #define BLOCK_BUFFER_SIZE 16 // maximize block buffer
+  #define BLOCK_BUFFER_SIZE 32 // maximize block buffer
 #endif
 
 // @section serial
 
 // The ASCII buffer for serial input
 #define MAX_CMD_SIZE 96
-#define BUFSIZE 4
+#define BUFSIZE 8
 
 // Transmission to Host Buffer Size
 // To save 386 bytes of PROGMEM (and TX_BUFFER_SIZE+3 bytes of RAM) set to 0.
@@ -943,7 +943,7 @@
 // Without XON/XOFF flow control (see SERIAL_XON_XOFF below) 32 bytes should be enough.
 // To use flow control, set this buffer size to at least 1024 bytes.
 // :[0, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
-//#define RX_BUFFER_SIZE 1024
+#define RX_BUFFER_SIZE 512
 
 #if RX_BUFFER_SIZE >= 1024
   // Enable to have the controller send XON/XOFF control characters to
@@ -954,18 +954,18 @@
 #if ENABLED(SDSUPPORT)
   // Enable this option to collect and display the maximum
   // RX queue usage after transferring a file to SD.
-  //#define SERIAL_STATS_MAX_RX_QUEUED
+  #define SERIAL_STATS_MAX_RX_QUEUED
 
   // Enable this option to collect and display the number
   // of dropped bytes after a file transfer to SD.
-  //#define SERIAL_STATS_DROPPED_RX
+  #define SERIAL_STATS_DROPPED_RX
 #endif
 
 // Enable an emergency-command parser to intercept certain commands as they
 // enter the serial receive buffer, so they cannot be blocked.
 // Currently handles M108, M112, M410
 // Does not work on boards using AT90USB (USBCON) processors!
-//#define EMERGENCY_PARSER
+#define EMERGENCY_PARSER
 
 // Bad Serial-connections can miss a received command by sending an 'ok'
 // Therefore some clients abort after 30 seconds in a timeout.
@@ -974,7 +974,7 @@
 //#define NO_TIMEOUTS 1000 // Milliseconds
 
 // Some clients will have this feature soon. This could make the NO_TIMEOUTS unnecessary.
-//#define ADVANCED_OK
+#define ADVANCED_OK
 
 // @section extras
 
@@ -993,7 +993,7 @@
  * Note that M207 / M208 / M209 settings are saved to EEPROM.
  *
  */
-//#define FWRETRACT  // ONLY PARTIALLY TESTED
+#define FWRETRACT  // ONLY PARTIALLY TESTED
 #if ENABLED(FWRETRACT)
   #define MIN_AUTORETRACT 0.1             // When auto-retract is on, convert E moves of this length and over
   #define MAX_AUTORETRACT 10.0            // Upper limit for auto-retract conversion
@@ -1026,7 +1026,7 @@
  * Requires NOZZLE_PARK_FEATURE.
  * This feature is required for the default FILAMENT_RUNOUT_SCRIPT.
  */
-//#define ADVANCED_PAUSE_FEATURE
+#define ADVANCED_PAUSE_FEATURE
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
   #define PAUSE_PARK_RETRACT_FEEDRATE         60  // (mm/s) Initial retract feedrate.
   #define PAUSE_PARK_RETRACT_LENGTH            2  // (mm) Initial retract.
@@ -1502,7 +1502,7 @@
 /**
  * M43 - display pin status, watch pins for changes, watch endstops & toggle LED, Z servo probe test, toggle pins
  */
-//#define PINS_DEBUGGING
+#define PINS_DEBUGGING
 
 /**
  * Auto-report temperatures with M155 S<seconds>
@@ -1584,15 +1584,15 @@
  * Will be sent in the form '//action:ACTION_ON_KILL', e.g. '//action:poweroff'.
  * The host must be configured to handle the action command.
  */
-//#define ACTION_ON_KILL "poweroff"
+#define ACTION_ON_KILL "poweroff"
 
 /**
  * Specify an action command to send to the host on pause and resume.
  * Will be sent in the form '//action:ACTION_ON_PAUSE', e.g. '//action:pause'.
  * The host must be configured to handle the action command.
  */
-//#define ACTION_ON_PAUSE "pause"
-//#define ACTION_ON_RESUME "resume"
+#define ACTION_ON_PAUSE "pause"
+#define ACTION_ON_RESUME "resume"
 
 //===========================================================================
 //====================== I2C Position Encoder Settings ======================
