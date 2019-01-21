@@ -41,8 +41,7 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, ui
     if (v != eeprom_read_byte(p)) {
       eeprom_write_byte(p, v);
       if (eeprom_read_byte(p) != v) {
-        SERIAL_ECHO_START();
-        SERIAL_ECHOLNPGM(MSG_ERR_EEPROM_WRITE);
+        SERIAL_ECHO_MSG(MSG_ERR_EEPROM_WRITE);
         return true;
       }
     }
@@ -55,7 +54,7 @@ bool PersistentStore::write_data(int &pos, const uint8_t *value, size_t size, ui
 
 bool PersistentStore::read_data(int &pos, uint8_t* value, size_t size, uint16_t *crc) {
   do {
-    uint8_t c = eeprom_read_byte((unsigned char*)pos);
+    uint8_t c = eeprom_read_byte((uint8_t*)pos);
     *value = c;
     crc16(crc, &c, 1);
     pos++;
