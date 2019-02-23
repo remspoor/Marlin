@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
@@ -61,8 +61,8 @@ void GcodeSuite::M125() {
   point_t park_point = NOZZLE_PARK_POINT;
 
   // Move XY axes to filament change position or given position
-  if (parser.seenval('X')) park_point.x = parser.linearval('X');
-  if (parser.seenval('Y')) park_point.y = parser.linearval('Y');
+  if (parser.seenval('X')) park_point.x = RAW_X_POSITION(parser.linearval('X'));
+  if (parser.seenval('Y')) park_point.y = RAW_X_POSITION(parser.linearval('Y'));
 
   // Lift Z axis
   if (parser.seenval('Z')) park_point.z = parser.linearval('Z');
@@ -79,8 +79,8 @@ void GcodeSuite::M125() {
   #endif
 
   #if HAS_LCD_MENU
+    lcd_advanced_pause_show_message(ADVANCED_PAUSE_MESSAGE_INIT, ADVANCED_PAUSE_MODE_PAUSE_PRINT);
     const bool show_lcd = parser.seenval('P');
-    lcd_advanced_pause_show_message(ADVANCED_PAUSE_MESSAGE_INIT, ADVANCED_PAUSE_MODE_PAUSE_PRINT, active_extruder);
   #else
     constexpr bool show_lcd = false;
   #endif

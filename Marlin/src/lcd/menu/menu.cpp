@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
@@ -28,6 +28,7 @@
 #include "../ultralcd.h"
 #include "../../module/planner.h"
 #include "../../module/motion.h"
+#include "../../module/printcounter.h"
 #include "../../gcode/queue.h"
 #include "../../sd/cardreader.h"
 #include "../../libs/buzzer.h"
@@ -158,22 +159,22 @@ void MenuItemBase::init(PGM_P const el, void * const ev, const int32_t minv, con
   liveEdit = le;
 }
 
-#define DEFINE_MENU_EDIT_ITEM(NAME) template class TMenuItem<MenuItemInfo_##NAME>;
+#define DEFINE_MENU_EDIT_ITEM(NAME) template class TMenuItem<MenuItemInfo_##NAME>
 
-DEFINE_MENU_EDIT_ITEM(int3);
-DEFINE_MENU_EDIT_ITEM(int4);
-DEFINE_MENU_EDIT_ITEM(int8);
-DEFINE_MENU_EDIT_ITEM(uint8);
-DEFINE_MENU_EDIT_ITEM(uint16_3);
-DEFINE_MENU_EDIT_ITEM(uint16_4);
-DEFINE_MENU_EDIT_ITEM(float3);
-DEFINE_MENU_EDIT_ITEM(float52);
-DEFINE_MENU_EDIT_ITEM(float43);
-DEFINE_MENU_EDIT_ITEM(float5);
-DEFINE_MENU_EDIT_ITEM(float51);
-DEFINE_MENU_EDIT_ITEM(float52sign);
-DEFINE_MENU_EDIT_ITEM(float62);
-DEFINE_MENU_EDIT_ITEM(long5);
+DEFINE_MENU_EDIT_ITEM(int3);        // 123, -12   right-justified
+DEFINE_MENU_EDIT_ITEM(int4);        // 1234, -123 right-justified
+DEFINE_MENU_EDIT_ITEM(int8);        // 123, -12   right-justified
+DEFINE_MENU_EDIT_ITEM(uint8);       // 123        right-justified
+DEFINE_MENU_EDIT_ITEM(uint16_3);    // 123, -12   right-justified
+DEFINE_MENU_EDIT_ITEM(uint16_4);    // 1234, -123 right-justified
+DEFINE_MENU_EDIT_ITEM(float3);      // 123        right-justified
+DEFINE_MENU_EDIT_ITEM(float52);     // 123.45
+DEFINE_MENU_EDIT_ITEM(float43);     // 1.234
+DEFINE_MENU_EDIT_ITEM(float5);      // 12345      right-justified
+DEFINE_MENU_EDIT_ITEM(float51);     // +1234.5
+DEFINE_MENU_EDIT_ITEM(float52sign); // +123.45
+DEFINE_MENU_EDIT_ITEM(float62);     // 1234.56    right-justified
+DEFINE_MENU_EDIT_ITEM(long5);       // 12345      right-justified
 
 void MenuItem_bool::action_edit(PGM_P pstr, bool *ptr, screenFunc_t callback) {
   UNUSED(pstr); *ptr ^= true; ui.refresh();
@@ -189,7 +190,9 @@ void MenuItem_bool::action_edit(PGM_P pstr, bool *ptr, screenFunc_t callback) {
   void _lcd_set_z_fade_height() { set_z_fade_height(lcd_z_fade_height); }
 #endif
 
-bool printer_busy() { return planner.movesplanned() || IS_SD_PRINTING(); }
+bool printer_busy() {
+  return planner.movesplanned() || IS_SD_PRINTING() || print_job_timer.isRunning();
+}
 
 /**
  * General function to go directly to a screen
@@ -211,7 +214,7 @@ void MarlinUI::goto_screen(screenFunc_t screen, const uint32_t encoder/*=0*/) {
           doubleclick_expire_ms = millis() + DOUBLECLICK_MAX_INTERVAL;
       }
       else if (screen == status_screen && currentScreen == menu_main && PENDING(millis(), doubleclick_expire_ms)) {
-        if (printer_busy()) {
+        if (all_axes_known() && printer_busy()) {
           screen =
             #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
               lcd_babystep_zoffset
@@ -232,7 +235,7 @@ void MarlinUI::goto_screen(screenFunc_t screen, const uint32_t encoder/*=0*/) {
     currentScreen = screen;
     encoderPosition = encoder;
     if (screen == status_screen) {
-      ui.defer_status_screen(false);
+      defer_status_screen(false);
       #if ENABLED(AUTO_BED_LEVELING_UBL)
         ubl.lcd_map_control = false;
       #endif

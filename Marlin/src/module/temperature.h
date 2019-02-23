@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
@@ -381,7 +381,7 @@ class Temperature {
 
     static inline void zero_fan_speeds() {
       #if FAN_COUNT > 0
-        FANS_LOOP(i) fan_speed[i] = 0;
+        FANS_LOOP(i) set_fan_speed(i, 0);
       #endif
     }
 
@@ -564,6 +564,12 @@ class Temperature {
      */
     #if HAS_PID_HEATING
       static void PID_autotune(const float &target, const int8_t hotend, const int8_t ncycles, const bool set_result=false);
+
+      #if ENABLED(NO_FAN_SLOWING_IN_PID_TUNING)
+        static bool adaptive_fan_slowing;
+      #elif ENABLED(ADAPTIVE_FAN_SLOWING)
+        constexpr static bool adaptive_fan_slowing = true;
+      #endif
 
       /**
        * Update the temp manager when PID values change

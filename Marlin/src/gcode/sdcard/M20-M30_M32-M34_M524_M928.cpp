@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
@@ -40,6 +40,10 @@
 
 #if ENABLED(PARK_HEAD_ON_PAUSE) || NUM_SERIAL > 1
   #include "../queue.h"
+#endif
+
+#if ENABLED(HOST_ACTION_COMMANDS)
+  #include "../../feature/host_actions.h"
 #endif
 
 /**
@@ -103,10 +107,15 @@ void GcodeSuite::M24() {
     print_job_timer.start();
   }
 
-  #ifdef ACTION_ON_RESUME
-    SERIAL_ECHOLNPGM("//action:" ACTION_ON_RESUME);
+  #if ENABLED(HOST_ACTION_COMMANDS)
+    #if ENABLED(HOST_PROMPT_SUPPORT)
+      host_prompt_open(PROMPT_INFO, PSTR("Resume SD"));
+    #endif
+    #ifdef ACTION_ON_RESUME
+      host_action_resume();
+    #endif
   #endif
-  
+
   ui.reset_status();
 }
 
@@ -114,21 +123,30 @@ void GcodeSuite::M24() {
  * M25: Pause SD Print
  */
 void GcodeSuite::M25() {
-  
+
   // Set initial pause flag to prevent more commands from landing in the queue while we try to pause
   #if ENABLED(SDSUPPORT)
-    if (IS_SD_PRINTING()) { card.pauseSDPrint(); }
+    if (IS_SD_PRINTING()) card.pauseSDPrint();
   #endif
 
   #if ENABLED(PARK_HEAD_ON_PAUSE)
+
     M125();
+
   #else
+
     print_job_timer.pause();
     ui.reset_status();
 
-    #ifdef ACTION_ON_PAUSE
-      SERIAL_ECHOLNPGM("//action:" ACTION_ON_PAUSE);
+    #if ENABLED(HOST_ACTION_COMMANDS)
+      #if ENABLED(HOST_PROMPT_SUPPORT)
+        host_prompt_open(PROMPT_PAUSE_RESUME, PSTR("Pause SD"), PSTR("Resume"));
+      #endif
+      #ifdef ACTION_ON_PAUSE
+        host_action_pause();
+      #endif
     #endif
+
   #endif
 }
 
@@ -216,7 +234,7 @@ void GcodeSuite::M28() {
  * Processed in write to file routine
  */
 void GcodeSuite::M29() {
-  // card.flag.saving = false;
+  card.flag.saving = false;
 }
 
 /**

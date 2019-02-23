@@ -1,6 +1,6 @@
 /**
  * Marlin 3D Printer Firmware
- * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (C) 2019 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
  * Based on Sprinter and grbl.
  * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
@@ -89,7 +89,7 @@
 #endif
 
 #if HAS_BED_PROBE
-  #include "../module/probe.h"
+  #include "probe.h"
 #endif
 
 #include "../feature/fwretract.h"
@@ -1961,7 +1961,7 @@ void MarlinSettings::postprocess() {
         const bool status = persistentStore.write_data(pos, (uint8_t *)&ubl.z_values, sizeof(ubl.z_values), &crc);
         persistentStore.access_finish();
 
-        if (status) SERIAL_ECHOPGM("?Unable to save mesh data.\n");
+        if (status) SERIAL_ECHOLNPGM("?Unable to save mesh data.");
         else        CHITCHAT_ECHOLNPAIR("Mesh saved in slot ", slot);
 
       #else
@@ -1990,7 +1990,7 @@ void MarlinSettings::postprocess() {
         const uint16_t status = persistentStore.read_data(pos, dest, sizeof(ubl.z_values), &crc);
         persistentStore.access_finish();
 
-        if (status) SERIAL_ECHOPGM("?Unable to load mesh data.\n");
+        if (status) SERIAL_ECHOLNPGM("?Unable to load mesh data.");
         else        CHITCHAT_ECHOLNPAIR("Mesh loaded from slot ", slot);
 
         EEPROM_FINISH();
@@ -2036,6 +2036,15 @@ void MarlinSettings::reset(PORTARG_SOLO) {
   planner.settings.min_travel_feedrate_mm_s = DEFAULT_MINTRAVELFEEDRATE;
 
   #if HAS_CLASSIC_JERK
+    #ifndef DEFAULT_XJERK
+      #define DEFAULT_XJERK 0
+    #endif
+    #ifndef DEFAULT_YJERK
+      #define DEFAULT_YJERK 0
+    #endif
+    #ifndef DEFAULT_ZJERK
+      #define DEFAULT_ZJERK 0
+    #endif
     planner.max_jerk[X_AXIS] = DEFAULT_XJERK;
     planner.max_jerk[Y_AXIS] = DEFAULT_YJERK;
     planner.max_jerk[Z_AXIS] = DEFAULT_ZJERK;
@@ -2076,6 +2085,10 @@ void MarlinSettings::reset(PORTARG_SOLO) {
       toolchange_settings.change_point = TOOLCHANGE_PARK_XY;
     #endif
     toolchange_settings.z_raise = TOOLCHANGE_ZRAISE;
+  #endif
+
+  #if ENABLED(MAGNETIC_PARKING_EXTRUDER)
+    mpe_settings_init();
   #endif
 
   //
@@ -2366,6 +2379,13 @@ void MarlinSettings::reset(PORTARG_SOLO) {
     #define SAY_UNITS_P(PORT, COLON) say_units(COLON)
   #endif
 
+  void report_M92(
+    #if NUM_SERIAL > 1
+      const int8_t port,
+    #endif
+    const bool echo=true, const int8_t e=-1
+  );
+
   /**
    * M503 - Report current settings in RAM
    *
@@ -2458,21 +2478,12 @@ void MarlinSettings::reset(PORTARG_SOLO) {
     #endif // !NO_VOLUMETRICS
 
     CONFIG_ECHO_HEADING("Steps per unit:");
-    CONFIG_ECHO_START();
-    SERIAL_ECHOPAIR_P(port, "  M92 X", LINEAR_UNIT(planner.settings.axis_steps_per_mm[X_AXIS]));
-    SERIAL_ECHOPAIR_P(port, " Y", LINEAR_UNIT(planner.settings.axis_steps_per_mm[Y_AXIS]));
-    SERIAL_ECHOPAIR_P(port, " Z", LINEAR_UNIT(planner.settings.axis_steps_per_mm[Z_AXIS]));
-    #if DISABLED(DISTINCT_E_FACTORS)
-      SERIAL_ECHOPAIR_P(port, " E", VOLUMETRIC_UNIT(planner.settings.axis_steps_per_mm[E_AXIS]));
-    #endif
-    SERIAL_EOL_P(port);
-    #if ENABLED(DISTINCT_E_FACTORS)
-      CONFIG_ECHO_START();
-      for (uint8_t i = 0; i < E_STEPPERS; i++) {
-        SERIAL_ECHOPAIR_P(port, "  M92 T", (int)i);
-        SERIAL_ECHOLNPAIR_P(port, " E", VOLUMETRIC_UNIT(planner.settings.axis_steps_per_mm[E_AXIS + i]));
-      }
-    #endif
+    report_M92(
+      #if NUM_SERIAL > 1
+        port,
+      #endif
+      !forReplay
+    );
 
     CONFIG_ECHO_HEADING("Maximum feedrates (units/s):");
     CONFIG_ECHO_START();
